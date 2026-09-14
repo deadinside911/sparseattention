@@ -10,7 +10,7 @@ scores = query_matrix @ keys_matrix.T
 
 scores /= (D ** 0.5)
 
-mask = torch.ones(N, N)
+mask = torch.tril(torch.ones(N, N))
 scores = scores.masked_fill(mask == 0, float("-inf"))
 
 attention_weights = torch.softmax(scores, dim=1)
