@@ -15,3 +15,11 @@ Representing allowed interactions with 1s and disallowed interactions with 0s, m
 mask = torch.triu(torch.ones(N, N))
 mask = mask - torch.triu(torch.ones(N, N), diagonal=window_size + 1)
 ```
+
+## 1.3 Correctness harness
+
+Checking if sparse matches dense on unmasked positions within tolerance
+
+```python
+print(torch.allclose(dense_output, sparse_output, atol=tolerance))
+```

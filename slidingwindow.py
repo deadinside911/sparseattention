@@ -2,6 +2,7 @@ import torch
 
 N, D = (15, 15)
 window_size = 2
+tolerance = 1e-5
 
 query_matrix = torch.rand(N, D)
 keys_matrix = torch.rand(N, D)
@@ -17,11 +18,20 @@ mask = mask - torch.triu(torch.ones(N, N), diagonal=window_size + 1)
 
 print("mask: ", mask)
 
-scores = scores.masked_fill(mask == 0, float("-inf"))
+masked_scores = scores.masked_fill(mask == 0, float("-inf"))
 
-attention_weights = torch.softmax(scores, dim=1)
+sparse_attention_weights = torch.softmax(masked_scores, dim=1)
 
-output = attention_weights @ values_matrix
+dense_masked_scores = scores.masked_fill(mask == 0, float("-inf"))
+dense_attention_weights = torch.softmax(dense_masked_scores, dim=1)
 
-print("attention weights", attention_weights)
-print("output", output)
+sparse_output = sparse_attention_weights @ values_matrix
+dense_output = dense_attention_weights @ values_matrix
+
+print("sparse attention weights", sparse_attention_weights)
+print("sparse output", sparse_output)
+
+print("dense attention weights", dense_attention_weights)
+print("dense output", dense_output)
+
+print(torch.allclose(dense_output, sparse_output, atol=tolerance))
